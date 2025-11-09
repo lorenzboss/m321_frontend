@@ -94,11 +94,8 @@ export default function Navbar() {
         <div className="navbar-container">
           <div>
             <Link to="/" className="navbar-title-link">
-              <h1>Memoriq</h1>
+              <h1>MindLink</h1>
             </Link>
-          </div>
-          <div className="navbar-button-container">
-            <span>Loading...</span>
           </div>
         </div>
       </nav>
@@ -111,7 +108,7 @@ export default function Navbar() {
         <div className="navbar-container">
           <div>
             <Link to="/" className="navbar-title-link">
-              <h1>Memoriq</h1>
+              <h1>MindLink</h1>
             </Link>
           </div>
           <div className="navbar-button-container">
@@ -132,7 +129,6 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="user-info-container">
-                <span className="user-name">{user?.username}</span>
                 <button className="navbar-button btn-logout" onClick={logout}>
                   Sign Out
                 </button>
