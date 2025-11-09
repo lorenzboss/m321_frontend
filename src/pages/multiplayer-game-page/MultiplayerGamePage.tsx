@@ -8,7 +8,6 @@ import "./MultiplayerGamePage.css";
 interface Player {
   id: string;
   name: string;
-  email?: string;
   socketId: string;
   isReady: boolean;
 }
@@ -91,12 +90,12 @@ export default function MultiplayerGamePage() {
           setError(data.error || "Authentication failed");
           setIsConnecting(false);
         }
-      },
+      }
     );
 
     socket.on("game-joined", () => setError(""));
     socket.on("game-state-updated", (newGameState: GameState) =>
-      setGameState(newGameState),
+      setGameState(newGameState)
     );
     socket.on("player-joined", () => {});
     socket.on("player-left", () => {});
@@ -114,9 +113,8 @@ export default function MultiplayerGamePage() {
     });
 
     socket.emit("authenticate", {
-      uuid: user.uuid,
-      name: user.name,
-      email: user.email,
+      id: user.id,
+      username: user.username,
     });
 
     return () => {
@@ -161,11 +159,11 @@ export default function MultiplayerGamePage() {
           gameState.game.currentTurnStartTime
         ) {
           const currentTurnStart = new Date(
-            gameState.game.currentTurnStartTime,
+            gameState.game.currentTurnStartTime
           ).getTime();
           const currentTurnTime = now - currentTurnStart;
           newTimers[player.id] = Math.floor(
-            (totalTime + currentTurnTime) / 1000,
+            (totalTime + currentTurnTime) / 1000
           );
         } else {
           newTimers[player.id] = Math.floor(totalTime / 1000);
@@ -236,8 +234,9 @@ export default function MultiplayerGamePage() {
   }
 
   const { game } = gameState;
-  const me = game.players.find((p) => p.id === user?.uuid);
-  const opp = game.players.find((p) => p.id !== user?.uuid);
+  const userId = String(user?.id);
+  const me = game.players.find((p) => p.id === userId);
+  const opp = game.players.find((p) => p.id !== userId);
 
   const twoPlayersReady = game.players.length >= 2;
   const waiting = game.status === "waiting" || !twoPlayersReady;
@@ -375,7 +374,7 @@ export default function MultiplayerGamePage() {
                         }
                         onClick={() => handleCardClick(card.id)}
                         matchedBy={card.matchedBy}
-                        currentUserId={user?.uuid}
+                        currentUserId={String(user?.id)}
                       />
                     </div>
                   ))}

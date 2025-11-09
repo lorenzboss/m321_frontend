@@ -18,7 +18,6 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  token: string | null;
   checkAuthStatus: () => Promise<boolean>;
   login: (username: string, password: string) => Promise<boolean>;
   register: (username: string, password: string) => Promise<boolean>;
@@ -43,32 +42,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [token, setToken] = useState<string | null>(null);
 
-  // Initialize token from localStorage
+  // Initialize auth status on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem("auth_token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    checkAuthStatus();
     setIsLoading(false);
   }, []);
 
   const checkAuthStatus = async (): Promise<boolean> => {
-    const currentToken = token || localStorage.getItem("auth_token");
-    if (!currentToken) {
-      setUser(null);
-      setIsAuthenticated(false);
-      return false;
-    }
-
     try {
       const response = await fetch(`${GAME_SERVICE_URL}/auth`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${currentToken}`,
         },
+        credentials: "include", // Include cookies in request
       });
 
       if (response.status === 200) {
@@ -81,7 +69,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             username: data.user.username,
           });
           setIsAuthenticated(true);
-          setToken(currentToken);
           return true;
         }
       }
@@ -89,15 +76,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // If we get here, authentication failed
       setUser(null);
       setIsAuthenticated(false);
-      setToken(null);
-      localStorage.removeItem("auth_token");
       return false;
     } catch (error) {
       console.error("Auth check error:", error);
       setUser(null);
       setIsAuthenticated(false);
-      setToken(null);
-      localStorage.removeItem("auth_token");
       return false;
     }
   };
@@ -112,16 +95,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Include cookies in request
         body: JSON.stringify({ username, password }),
       });
 
       if (response.status === 200) {
         const data = await response.json();
         console.log("Login success:", data);
-
-        // Store token
-        localStorage.setItem("auth_token", data.token);
-        setToken(data.token);
 
         // Set user data
         setUser({
@@ -151,16 +131,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Include cookies in request
         body: JSON.stringify({ username, password }),
       });
 
       if (response.status === 201) {
         const data = await response.json();
         console.log("Registration success:", data);
-
-        // Store token
-        localStorage.setItem("auth_token", data.token);
-        setToken(data.token);
 
         // Set user data
         setUser({
@@ -181,10 +158,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("auth_token");
-    setToken(null);
     setUser(null);
     setIsAuthenticated(false);
+
+    // Call logout endpoint to clear cookie on server
+    fetch(`${GAME_SERVICE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    }).catch((err) => console.error("Logout error:", err));
   };
 
   useEffect(() => {
@@ -195,7 +176,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isAuthenticated,
     isLoading,
-    token,
     checkAuthStatus,
     login,
     register,

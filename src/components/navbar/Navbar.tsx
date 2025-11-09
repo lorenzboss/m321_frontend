@@ -45,6 +45,7 @@ export default function Navbar() {
         const response = await fetch(`${GAME_SERVICE_URL}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include", // Include cookies
           body: JSON.stringify({
             username: formData.name,
             password: formData.password,
@@ -52,8 +53,8 @@ export default function Navbar() {
         });
 
         if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem("auth_token", data.token);
+          handleCloseAuth();
+          // Refresh auth status and reload
           window.location.reload();
         } else {
           const data = await response.json();
@@ -63,6 +64,7 @@ export default function Navbar() {
         const response = await fetch(`${GAME_SERVICE_URL}/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include", // Include cookies
           body: JSON.stringify({
             username: formData.name,
             password: formData.password,
@@ -70,8 +72,8 @@ export default function Navbar() {
         });
 
         if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem("auth_token", data.token);
+          handleCloseAuth();
+          // Refresh auth status and reload
           window.location.reload();
         } else {
           const data = await response.json();
