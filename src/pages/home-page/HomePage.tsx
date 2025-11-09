@@ -43,7 +43,7 @@ export default function HomePage() {
       setStatsError(null);
 
       try {
-        const payload = await fetchUserStats(user.name, {
+        const payload = await fetchUserStats(user.username, {
           signal: statsController.signal,
         });
 
@@ -157,7 +157,7 @@ export default function HomePage() {
           setError(data.error || "Authentication failed");
           setIsCreatingGame(false);
         }
-      },
+      }
     );
 
     socket.once("game-created", (gameId: string) => {
@@ -171,9 +171,8 @@ export default function HomePage() {
     });
 
     socket.emit("authenticate", {
-      uuid: user.uuid,
-      name: user.name,
-      email: user.email,
+      id: user.id,
+      username: user.username,
     });
   };
 
@@ -217,11 +216,11 @@ export default function HomePage() {
           {/* The middle section remains exactly as before! */}
           <div className="welcome-section glass glow">
             <h2 className="headline">
-              Welcome back, <span className="gradient-text">{user?.name}</span>!
+              Welcome back,{" "}
+              <span className="gradient-text">{user?.username}</span>!
             </h2>
             <div className="user-info">
-              <div>Username: {user?.name}</div>
-              <div>Email Address: {user?.email}</div>
+              <div>Username: {user?.username}</div>
             </div>
           </div>
           {error && (

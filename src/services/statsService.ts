@@ -1,7 +1,7 @@
 import { LeaderboardEntry, UserStats } from "../types/stats";
 
 const BASE_URL = (
-  process.env.REACT_APP_GAME_SERVICE_URL || "http://localhost:8001"
+  (import.meta as any).env.VITE_GAME_SERVICE_URL || "http://localhost:8001"
 ).replace(/\/+$/, "");
 
 type FetchOptions = Omit<RequestInit, "body"> & { signal?: AbortSignal };

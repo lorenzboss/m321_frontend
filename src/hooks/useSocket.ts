@@ -16,9 +16,9 @@ export const useSocket = (): Socket | null => {
     }
 
     if (!globalSocket) {
-      // WebSocket URL aus Umgebungsvariablen
+      // WebSocket URL aus Umgebungsvariablen (Vite uses import.meta.env)
       const socketUrl =
-        process.env.REACT_APP_WEBSOCKET_URL || "ws://localhost:8001";
+        (import.meta as any).env.VITE_WEBSOCKET_URL || "ws://localhost:8001";
 
       console.log("Creating new WebSocket connection to:", socketUrl);
 
